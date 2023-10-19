@@ -2,6 +2,8 @@
 
 Pruebas de concepto de uso de una CLI para el builder de apps y ambientes.
 
+![builder](doc/builder-cli.png)
+
 ## Configuración
 
 ### Build
