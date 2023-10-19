@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/eximiait/builder-cli/creates"
 	"github.com/spf13/cobra"
@@ -96,27 +97,67 @@ func getAccessToken() string {
 	return string(byteToken)
 }
 
+func readTargetRepositoryData() (map[string]string, error) {
+	var groupName string
+	var repoName string
+
+	fmt.Print("Nombre del grupo destino: ")
+	_, err := fmt.Scan(&groupName)
+	if err != nil {
+		fmt.Println("Error al leer el nombre del grupo destino:", err)
+		os.Exit(1)
+	}
+
+	fmt.Print("Nombre del repositorio destino: ")
+	_, err = fmt.Scan(&repoName)
+	if err != nil {
+		fmt.Println("Error al leer el nombre del repositorio destino:", err)
+		os.Exit(1)
+	}
+
+	// Limpiamos los caracteres de nueva línea de los strings leídos
+	groupName = strings.TrimSpace(groupName)
+	repoName = strings.TrimSpace(repoName)
+
+	// Se pide el token de acceso para el repo destino
+	fmt.Print("Access Token destino: ")
+	targetToken := getAccessToken()
+
+	return map[string]string{
+		"groupName":   groupName,
+		"repoName":    repoName,
+		"targetToken": targetToken,
+	}, nil
+}
+
 var createCodeRepository = &cobra.Command{
 	Use:   "createCodeRepository",
-	Short: "Se crea un repositorio de código con el scaffolding de la aplicación",
-	Long:  `Se crea un repositorio de código con el scaffolding de la aplicación`,
+	Short: "A code repository is created with the scaffolding of the application",
+	Long:  `A code repository is created with the scaffolding of the application`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		fmt.Print("Introduzca el Access Token provisto para clonar un repo starter: ")
 		token := getAccessToken()
-		groupsApiURL := GitlabHost + "/api/v4/groups"
+		groupsApiURL := GitlabHostOrigin + "/api/v4/groups"
 		repoMap := getReposForGroup(groupsApiURL, startersGroupName, token)
 
-		repoUrl := selectApplicationType(repoMap)
+		originRepoUrl := selectApplicationType(repoMap)
 
-		creates.CreateCodeRepository(GitlabHost, repoUrl, token)
+		fmt.Println()
+		result, err := readTargetRepositoryData()
+		if err != nil {
+			fmt.Printf("Hubo un error: %v\n", err)
+			return
+		}
+
+		creates.CreateCodeRepository(GitlabHostTarget, originRepoUrl, result["targetToken"], result["groupName"], result["repoName"])
 	},
 }
 
 var createGitOpsRepository = &cobra.Command{
-	Use:   "createGitOpsepository",
-	Short: "Se crea un repositorio GitOps con el scaffolding del ambiente",
-	Long:  `Se crea un repositorio GitOps con el scaffolding del ambiente`,
+	Use:   "createGitOpsRepository",
+	Short: "A GitOps repository is created with the scaffolding of the environment",
+	Long:  `A GitOps repository is created with the scaffolding of the environment`,
 	Run: func(cmd *cobra.Command, args []string) {
 		creates.CreateGitOpsRepository()
 	},

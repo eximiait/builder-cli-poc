@@ -23,16 +23,16 @@ func cloneRepo(repoURL, token, tmpDir string) error {
 	return cmd.Run()
 }
 
-func CreateCodeRepository(gitlabHost, urlToClone, token string) {
+func CreateCodeRepository(gitlabHost, originRepoUrl, token, targetGroupName, targetRepoName string) {
 
 	// Limpia los espacios y saltos de línea de las cadenas
-	urlToClone = strings.TrimSpace(urlToClone)
+	originRepoUrl = strings.TrimSpace(originRepoUrl)
 	fmt.Println()
 	tmpDir := "tmp"
-	if err := cloneRepo(urlToClone, token, tmpDir); err != nil {
+	if err := cloneRepo(originRepoUrl, token, tmpDir); err != nil {
 		fmt.Printf("\nError al clonar el repositorio: %v\n", err)
 	}
 
-	gitlab.PushToNewCleanRepo(tmpDir, gitlabHost, "demo-cicd1473038", "nuevo", token)
+	gitlab.PushToNewCleanRepo(tmpDir, gitlabHost, targetGroupName, targetRepoName, token)
 
 }

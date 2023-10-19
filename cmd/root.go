@@ -12,7 +12,8 @@ import (
 
 var Verbose bool
 var Debug bool
-var GitlabHost string
+var GitlabHostTarget string
+var GitlabHostOrigin string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -35,6 +36,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "Display debugging output in the console. (default: false)")
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 
-	rootCmd.PersistentFlags().StringVarP(&GitlabHost, "gitlab-host", "g", "https://gitlab.com", "The URL for GitLab")
+	rootCmd.PersistentFlags().StringVarP(&GitlabHostOrigin, "gitlab-host-origin", "o", "https://gitlab.com", "The GitLab URL for origin, it's used for cloning starters")
+	viper.BindPFlag("gitlabHostOrigin", rootCmd.PersistentFlags().Lookup("gitlab-host-origin"))
+
+	rootCmd.PersistentFlags().StringVarP(&GitlabHostTarget, "gitlab-host", "g", "https://gitlab.com", "The GitLab URL where the project will be created")
 	viper.BindPFlag("gitlabHost", rootCmd.PersistentFlags().Lookup("gitlab-host"))
 }
