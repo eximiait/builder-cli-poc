@@ -7,7 +7,13 @@ Pruebas de concepto de uso de una CLI para el builder de apps y ambientes.
 ### Build
 
 ```bash
+# linux
 docker build . -t builder-cli
+```
+
+```bash
+# windows
+docker build --build-arg TARGETOS=windows --build-arg EXT=.exe -t builder-cli-win .
 ```
 
 ### Ejecución
