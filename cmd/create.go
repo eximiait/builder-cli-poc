@@ -63,10 +63,6 @@ func getReposForGroup(groupsApiURL, groupName, token string) map[string]string {
 	return repoMap
 }
 
-func getUrlForRepo(repoMap map[string]string, repoName string) string {
-	return repoMap[repoName]
-}
-
 func selectApplicationType(repos map[string]string) string {
 	// Mostrar todos los nombres de repositorios
 	keys := make([]string, 0, len(repos))
