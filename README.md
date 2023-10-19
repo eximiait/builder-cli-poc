@@ -25,7 +25,7 @@ docker run --rm --mount "type=bind,src=$($pwd)/bin,target=/out" --entrypoint /bi
 ```
 
 1. Ejecutar el binario
-   
+
 ```bash
 # bash
 $ .\bin\builder-cli
