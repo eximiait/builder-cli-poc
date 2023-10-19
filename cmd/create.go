@@ -4,18 +4,89 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"os"
 
 	"github.com/eximiait/builder-cli/creates"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
-// Mapping de lenguajes a sus respectivas URLs
-var languageURLMap = map[string]string{
-	"java":   "https://gitlab.com/demo-cicd1473038/app-code",
-	"dotnet": "https://gitlab.com/demo-cicd1473038/app-code-dotnet",
-	"vuejs":  "https://gitlab.com/demo-cicd1473038/app-code-vuejs", // Añade aquí la URL para vuejs si la tienes.
+type Repository struct {
+	Name   string `json:"name"`
+	WebURL string `json:"web_url"`
+}
+
+func getReposForGroup(groupsApiURL, groupName, token string) map[string]string {
+	// Mapa para almacenar los resultados
+	repoMap := make(map[string]string)
+
+	// Construyendo la URL
+	url := fmt.Sprintf("%s/%s/projects", groupsApiURL, groupName)
+
+	// Crear la solicitud HTTP
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatalf("Error al crear la solicitud: %v", err)
+	}
+
+	req.Header.Set("PRIVATE-TOKEN", token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatalf("Error al hacer la solicitud: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Leer el cuerpo de la respuesta
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Error al leer la respuesta: %v", err)
+	}
+
+	// Deserializar el JSON
+	var repos []Repository
+	if err := json.Unmarshal(body, &repos); err != nil {
+		log.Fatalf("Error al deserializar el JSON: %v", err)
+	}
+
+	// Rellenar el mapa
+	for _, repo := range repos {
+		repoMap[repo.Name] = repo.WebURL
+	}
+
+	return repoMap
+}
+
+func getUrlForRepo(repoMap map[string]string, repoName string) string {
+	return repoMap[repoName]
+}
+
+func selectApplicationType(repos map[string]string) string {
+	// Mostrar todos los nombres de repositorios
+	keys := make([]string, 0, len(repos))
+	for k := range repos {
+		keys = append(keys, k)
+	}
+
+	fmt.Println("Por favor, selecciona un repositorio:")
+	for i, key := range keys {
+		fmt.Printf("%d. %s\n", i+1, key)
+	}
+
+	// Leer selección del usuario
+	var choice int
+	_, err := fmt.Scan(&choice)
+	if err != nil || choice < 1 || choice > len(keys) {
+		log.Fatalf("Selección fuera de rango. Por favor, selecciona un número entre 1 y %d.", len(keys))
+		os.Exit(1)
+	}
+
+	// Devolver la URL del repositorio elegido
+	return repos[keys[choice-1]]
 }
 
 var createCodeRepository = &cobra.Command{
@@ -24,30 +95,19 @@ var createCodeRepository = &cobra.Command{
 	Long:  `Se crea un repositorio de código con el scaffolding de la aplicación`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// Obtener lenguajes desde el mapa
-		languages := make([]string, 0, len(languageURLMap))
-		for lang := range languageURLMap {
-			languages = append(languages, lang)
+		fmt.Print("Introduce el Access Token (PAT) para descargar el starter: ")
+		byteToken, err := term.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			fmt.Println("\nError al leer el PAT.")
+			return
 		}
+		token := string(byteToken)
+		groupsApiURL := GitlabHost + "/api/v4/groups"
+		repoMap := getReposForGroup(groupsApiURL, "demo-cicd1473038", token)
 
-		// Mostrar opciones de lenguaje
-		fmt.Println("Por favor, selecciona un lenguaje:")
-		for i, lang := range languages {
-			fmt.Printf("%d. %s\n", i+1, lang)
-		}
+		repoUrl := selectApplicationType(repoMap)
 
-		// Leer selección del usuario
-		var choice int
-		_, err := fmt.Scan(&choice)
-		if err != nil || choice < 1 || choice > len(languages) {
-			fmt.Println("Selección inválida")
-			os.Exit(1)
-		}
-
-		selectedLanguage := languages[choice-1]
-		fmt.Printf("Has seleccionado: %s\n", selectedLanguage)
-		fmt.Printf("URL asociada: %s\n", languageURLMap[selectedLanguage])
-		creates.CreateCodeRepository(GitlabHost, selectedLanguage, languageURLMap[selectedLanguage])
+		creates.CreateCodeRepository(GitlabHost, repoUrl, token)
 	},
 }
 
@@ -63,15 +123,4 @@ var createGitOpsRepository = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(createCodeRepository)
 	rootCmd.AddCommand(createGitOpsRepository)
-}
-
-func getLanguageByIndex(index int) string {
-	var i int = 1
-	for lang := range languageURLMap {
-		if i == index {
-			return lang
-		}
-		i++
-	}
-	return ""
 }

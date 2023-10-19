@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/eximiait/builder-cli/gitlab"
-	"golang.org/x/term"
 )
 
 func cloneRepo(repoURL, token, tmpDir string) error {
@@ -24,15 +23,7 @@ func cloneRepo(repoURL, token, tmpDir string) error {
 	return cmd.Run()
 }
 
-func CreateCodeRepository(gitlabHost, appType, urlToClone string) {
-
-	fmt.Print("Introduce el Access Token (PAT) para descargar el starter: ")
-	byteToken, err := term.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Println("\nError al leer el PAT.")
-		return
-	}
-	token := string(byteToken)
+func CreateCodeRepository(gitlabHost, urlToClone, token string) {
 
 	// Limpia los espacios y saltos de línea de las cadenas
 	urlToClone = strings.TrimSpace(urlToClone)

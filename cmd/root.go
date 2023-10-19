@@ -35,6 +35,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "Display debugging output in the console. (default: false)")
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 
-	rootCmd.PersistentFlags().StringVarP(&GitlabHost, "gitlab-host", "a", "https://gitlab.com", "The URL for GitLab")
+	rootCmd.PersistentFlags().StringVarP(&GitlabHost, "gitlab-host", "g", "https://gitlab.com", "The URL for GitLab")
 	viper.BindPFlag("gitlabHost", rootCmd.PersistentFlags().Lookup("gitlab-host"))
 }
