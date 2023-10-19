@@ -16,6 +16,8 @@ import (
 	"golang.org/x/term"
 )
 
+var startersGroupName = "starters4273342"
+
 type Repository struct {
 	Name   string `json:"name"`
 	WebURL string `json:"web_url"`
@@ -89,21 +91,25 @@ func selectApplicationType(repos map[string]string) string {
 	return repos[keys[choice-1]]
 }
 
+func getAccessToken() string {
+	byteToken, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		fmt.Println("\nError al leer el Access Token.")
+		os.Exit(1)
+	}
+	return string(byteToken)
+}
+
 var createCodeRepository = &cobra.Command{
 	Use:   "createCodeRepository",
 	Short: "Se crea un repositorio de código con el scaffolding de la aplicación",
 	Long:  `Se crea un repositorio de código con el scaffolding de la aplicación`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		fmt.Print("Introduce el Access Token (PAT) para descargar el starter: ")
-		byteToken, err := term.ReadPassword(int(os.Stdin.Fd()))
-		if err != nil {
-			fmt.Println("\nError al leer el PAT.")
-			return
-		}
-		token := string(byteToken)
+		fmt.Print("Introduzca el Access Token provisto para clonar un repo starter: ")
+		token := getAccessToken()
 		groupsApiURL := GitlabHost + "/api/v4/groups"
-		repoMap := getReposForGroup(groupsApiURL, "demo-cicd1473038", token)
+		repoMap := getReposForGroup(groupsApiURL, startersGroupName, token)
 
 		repoUrl := selectApplicationType(repoMap)
 
