@@ -27,7 +27,7 @@ jobs:
 
     - name: Generate changelog
       run: |
-        docker run -it --rm \
+        docker run --rm \
         -e CHANGELOG_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
         githubchangeloggenerator/github-changelog-generator \
         -u ${{ github.repository_owner }} \
