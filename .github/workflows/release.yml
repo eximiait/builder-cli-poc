@@ -12,30 +12,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Download builder-cli-linux from artifacts
-      uses: actions/download-artifact@v2
+    - name: Set up Go
+      uses: actions/setup-go@v4
       with:
-        name: builder-cli-linux
-        path: ./builder-cli-linux
+        go-version: 1.21.3
 
-    - name: Download builder-cli-windows.exe from artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: builder-cli-windows.exe
-        path: ./builder-cli-windows.exe
+    - name: Install dependencies
+      run: go mod download
 
-    - name: Generate changelog
-      run: |
-        docker run --rm -v "$(pwd)":/usr/local/src/ \
-        -e CHANGELOG_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
-        githubchangeloggenerator/github-changelog-generator \
-        -u ${{ github.repository_owner }} \
-        -p ${{ github.event.repository.name }} \
-        --since-tag ${{ github.ref_name }} \
-        --due-tag ${{ github.ref_name }} \
-        --unreleased-label ${{ github.ref_name }} \
-        --include-tags-regex "${{ github.ref_name }}" \
-        -o /usr/local/src/CHANGELOG.md
+    - name: Build Linux binary
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o builder-cli-linux .
+      
+    - name: Build Windows binary
+      run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o builder-cli-windows.exe .
     
     - name: Create GitHub Release
       id: create_release
@@ -46,7 +35,6 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-
 
     - name: Upload Linux binary to release
       uses: actions/upload-release-asset@v1
