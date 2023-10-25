@@ -43,7 +43,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
           body_path: CHANGELOG.md
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
@@ -55,6 +55,8 @@ jobs:
         asset_path: ./builder-cli-linux
         asset_name: builder-cli-linux
         asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Windows binary to release
       uses: actions/upload-release-asset@v1
@@ -63,3 +65,5 @@ jobs:
         asset_path: ./builder-cli-windows.exe
         asset_name: builder-cli-windows.exe
         asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
