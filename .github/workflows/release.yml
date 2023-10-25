@@ -33,11 +33,13 @@ jobs:
         -u ${{ github.repository_owner }} \
         -p ${{ github.event.repository.name }} \
         -o CHANGELOG.md
+    - name: List files in current directory
+      run: ls -la
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-          body_path: ${{ github.workspace }}/CHANGELOG.md
+          #body_path: ${{ github.workspace }}/CHANGELOG.md
           tag_name: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
