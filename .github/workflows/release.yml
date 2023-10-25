@@ -36,10 +36,6 @@ jobs:
         -p ${{ github.event.repository.name }} \
         -o /usr/local/src/CHANGELOG.md
     
-    - name: Print CHANGELOG contents
-      if: startsWith(github.ref, 'refs/tags/')
-      run: cat CHANGELOG.md
-
     - name: Create GitHub Release
       id: create_release
       uses: softprops/action-gh-release@v1
