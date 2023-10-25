@@ -36,6 +36,7 @@ jobs:
         -p ${{ github.event.repository.name }} \
         --since-tag ${{ github.ref_name }} \
         --due-tag ${{ github.ref_name }} \
+        --no-unreleased \
         -o /usr/local/src/CHANGELOG.md
     
     - name: Create GitHub Release
