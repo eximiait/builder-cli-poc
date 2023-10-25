@@ -26,13 +26,6 @@ jobs:
     - name: Build Windows binary
       run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o builder-cli-windows.exe .
 
-    - name: Calculate tags for changelog generator
-      run: |
-        LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-        PREVIOUS_LATEST_TAG=$(git describe --tags $(git rev-list --tags --skip=1 --max-count=1))
-        echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-        echo "PREVIOUS_LATEST_TAG=$PREVIOUS_LATEST_TAG" >> $GITHUB_ENV
-       
     - name: Generate changelog
       if: startsWith(github.ref, 'refs/tags/')
       run: |
@@ -41,8 +34,8 @@ jobs:
         githubchangeloggenerator/github-changelog-generator \
         -u ${{ github.repository_owner }} \
         -p ${{ github.event.repository.name }} \
-        --since-tag $PREVIOUS_LATEST_TAG \
-        --due-tag $LATEST_TAG \
+        --since-tag ${{ github.ref_name }} \
+        --due-tag ${{ github.ref_name }} \
         -o /usr/local/src/CHANGELOG.md
     
     - name: Create GitHub Release
