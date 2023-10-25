@@ -1,4 +1,4 @@
-# CLI Builder 3.0
+# CLI Builder 2.0
 
 Pruebas de concepto de uso de una CLI para el builder de apps y ambientes.
 
