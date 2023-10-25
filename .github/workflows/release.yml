@@ -37,7 +37,7 @@ jobs:
         --since-tag ${{ github.ref_name }} \
         --due-tag ${{ github.ref_name }} \
         --unreleased-label ${{ github.ref_name }} \
-        --no-issues \
+        --include-tags-regex "${{ github.ref_name }}" \
         -o /usr/local/src/CHANGELOG.md
     
     - name: Create GitHub Release
