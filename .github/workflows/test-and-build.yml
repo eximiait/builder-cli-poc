@@ -3,7 +3,7 @@ name: Test and Build
 on:
   push:
     branches:
-      - main
+      - main # Solo para pruebas
   pull_request:
     branches:
       - main 
@@ -38,19 +38,7 @@ jobs:
       run: go mod download
 
     - name: Build Linux binary
-      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o builder-cli-linux .
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /dev/null .
       
     - name: Build Windows binary
-      run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o builder-cli-windows.exe .
-    
-    - name: Upload builder-cli-linux as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: builder-cli-linux
-        path: ./builder-cli-linux
-
-    - name: Upload builder-cli-windows.exe as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: builder-cli-windows.exe
-        path: ./builder-cli-windows.exe
+      run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o /dev/null .
