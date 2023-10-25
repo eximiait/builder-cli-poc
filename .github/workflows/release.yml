@@ -27,12 +27,12 @@ jobs:
 
     - name: Generate changelog
       run: |
-        docker run --rm \
+        docker run --rm -v "$(pwd)":/usr/local/src/ \
         -e CHANGELOG_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
         githubchangeloggenerator/github-changelog-generator \
         -u ${{ github.repository_owner }} \
         -p ${{ github.event.repository.name }} \
-        -o CHANGELOG.md
+        -o /usr/local/src/CHANGELOG.md
     - name: List files in current directory
       run: ls -la
 
