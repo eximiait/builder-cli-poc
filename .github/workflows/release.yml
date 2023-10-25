@@ -38,8 +38,9 @@ jobs:
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-          #body_path: ${{ github.workspace }}/CHANGELOG.md
+          body_path: CHANGELOG.md
           tag_name: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
