@@ -34,6 +34,7 @@ jobs:
         githubchangeloggenerator/github-changelog-generator \
         -u ${{ github.repository_owner }} \
         -p ${{ github.event.repository.name }} \
+        --max-tag ${{ github.ref_name }} \
         -o /usr/local/src/CHANGELOG.md
     
     - name: Create GitHub Release
