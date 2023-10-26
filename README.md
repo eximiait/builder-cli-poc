@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/eximiait/builder-cli-poc/graph/badge.svg?token=164NAAW6OA)](https://codecov.io/gh/eximiait/builder-cli-poc)
 # CLI Builder 10.0
 
 Pruebas de concepto de uso de una CLI para el builder de apps y ambientes.
