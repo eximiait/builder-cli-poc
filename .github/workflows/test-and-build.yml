@@ -21,7 +21,17 @@ jobs:
       - name: Install dependencies
         run: go mod download   
       - name: Test
-        run: go test -v ./...
+        run: go test -v ./... -coverprofile=coverage
+      - name: Show coverage
+        run: go tool cover -func=coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage
+          flags: unittests
+          name: codecov
+          fail_ci_if_error: false
   build:
     runs-on: ubuntu-latest
     needs: test
