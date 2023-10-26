@@ -1,3 +1,5 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eximiait_builder-cli-poc&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=eximiait_builder-cli-poc)
+
 # CLI Builder 11.0
 
 Pruebas de concepto de uso de una CLI para el builder de apps y ambientes.
