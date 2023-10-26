@@ -1,5 +1,6 @@
 [![codecov](https://codecov.io/gh/eximiait/builder-cli-poc/graph/badge.svg?token=164NAAW6OA)](https://codecov.io/gh/eximiait/builder-cli-poc)
-# CLI Builder 10.0
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eximiait_builder-cli-poc&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=eximiait_builder-cli-poc)
+# CLI Builder 11.0
 
 Pruebas de concepto de uso de una CLI para el builder de apps y ambientes.
 
