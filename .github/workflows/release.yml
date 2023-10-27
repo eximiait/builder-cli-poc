@@ -37,7 +37,9 @@ jobs:
           - os: linux
             extension: ''
           - tag : free
-            suffix: ''          
+            suffix: ''
+          - tag : pro
+            suffix: '-pro'            
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,14 +53,14 @@ jobs:
         run: go mod download
 
       - name: Build Binary
-        run: CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.suffix }}${{ matrix.extension }} -tags ${{ matrix.tag }} .
+        run: CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.suffix }}${{ matrix.extension }} -tags ${{ matrix.tag }} .
 
       - name: Upload ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }} binary to release
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.suffix }}${{ matrix.extension }}
-          asset_name: ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.suffix }}${{ matrix.extension }}
+          asset_path: ./${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.suffix }}${{ matrix.extension }}
+          asset_name: ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.suffix }}${{ matrix.extension }}
           asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
