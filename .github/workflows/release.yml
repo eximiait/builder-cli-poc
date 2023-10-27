@@ -38,8 +38,8 @@ jobs:
             extension: ''
           - tag : free
             suffix: ''
-          - tag : pro
-            suffix: '-pro'            
+          #- tag : pro
+          #  suffix: '-pro'            
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
