@@ -6,55 +6,52 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+'  # Semver pattern (e.g., 1.0.3)
 
 jobs:
-  release:
+  create_release:
     runs-on: ubuntu-latest
-    env:
-      BINARY_NAME_LINUX: builder-cli-linux  # Definimos la variable aquí
-      BINARY_NAME_WINDOWS: builder-cli-windows.exe
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+            tag_name: ${{ github.ref_name }}
+            token: ${{ secrets.GITHUB_TOKEN }}
+            draft: false
+            prerelease: false
+            generate_release_notes: true 
+  build:
+    name: Build on ${{ matrix.os }} (${{ matrix.arch }}) with ${{ matrix.tag }} tag
+    runs-on: ${{ matrix.os }}
+    needs: create_release
+    env:
+      BINARY_NAME: builder-cli
+    strategy:
+      matrix:
+        os: [linux, windows]
+        tag: [free]
+        arch: [amd64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: 1.21.3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.3
 
-    - name: Install dependencies
-      run: go mod download
+      - name: Install dependencies
+        run: go mod download
 
-    - name: Build Linux binary
-      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${{ env.BINARY_NAME_LINUX }} .
-      
-    - name: Build Windows binary
-      run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ${{ env.BINARY_NAME_WINDOWS }} .
-    
-    - name: Create GitHub Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-          tag_name: ${{ github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
+      - name: Build Binary
+        run: CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }} -tags ${{ matrix.tag }} .
 
-    - name: Upload Linux binary to release
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ env.BINARY_NAME_LINUX }}
-        asset_name: ${{ env.BINARY_NAME_LINUX }}
-        asset_content_type: application/octet-stream
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Upload Windows binary to release
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ env.BINARY_NAME_WINDOWS }}
-        asset_name: ${{ env.BINARY_NAME_WINDOWS }}
-        asset_content_type: application/octet-stream
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }} binary to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }}
+          asset_name: ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }}
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
