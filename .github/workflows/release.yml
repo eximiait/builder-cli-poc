@@ -31,6 +31,11 @@ jobs:
         os: [linux, windows]
         tag: [free]
         arch: [amd64]
+        include:
+          - os: windows
+            extension: .exe
+          - os: linux
+            extension: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,7 +49,7 @@ jobs:
         run: go mod download
 
       - name: Build Binary
-        run: CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }} -tags ${{ matrix.tag }} .
+        run: CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o ${{ env.BINARY_NAME}}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }}${{ matrix.extension }} -tags ${{ matrix.tag }} .
 
       - name: Upload ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tag }} binary to release
         uses: actions/upload-release-asset@v1
